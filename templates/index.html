@@ -10,7 +10,7 @@
     <div class="chat-container">
         <div class="chat-box" id="chat-box">
             <div class="bot-message">
-                <p>¡Hola! Soy un asistente que recomienda videojuegos con IA, ¿Describeme un juego que te guste?</p>
+                <p>¡Hola! Soy un asistente que recomienda series con IA, ¿Describeme una serie que te guste?</p>
             </div>
         </div>
         <form class="input-container" id="chat-form">
@@ -42,22 +42,36 @@
                 addMessage(userMessage);  // Agregar mensaje del usuario
                 inputField.value = '';  // Limpiar el campo de entrada
 
-                // Enviar el mensaje del usuario al backend mediante AJAX
-                fetch('/process', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ text_input: userMessage }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Agregar la respuesta del bot al chat
-                    addMessage(data.result, false);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                // Mostrar el mensaje de "procesando respuesta :taza de café:"
+                const processingMessage = "Procesando respuesta ☕...";
+                addMessage(processingMessage, false);
+
+                // Simular un retraso de 3 segundos antes de obtener la respuesta real
+                setTimeout(() => {
+                    // Eliminar el mensaje de "procesando respuesta"
+                    const chatBox = document.getElementById('chat-box');
+                    const lastBotMessage = chatBox.querySelector('.bot-message:last-child');
+                    if (lastBotMessage) {
+                        chatBox.removeChild(lastBotMessage);  // Eliminar el mensaje de procesamiento
+                    }
+
+                    // Enviar el mensaje del usuario al backend mediante AJAX
+                    fetch('/process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text_input: userMessage }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Agregar la respuesta del bot al chat
+                        addMessage(data.result, false);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }, 7000);  // Esperar 3 segundos
             }
         });
 

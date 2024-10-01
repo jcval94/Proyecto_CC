@@ -1,0 +1,6 @@
+runtime: python310  # Especifica Python 3.10
+entrypoint: gunicorn -b :$PORT main:app  # Reemplaza 'main:app' si tu archivo principal tiene otro nombre
+
+handlers:
+  - url: /.*
+    script: auto

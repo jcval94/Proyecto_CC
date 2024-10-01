@@ -50,6 +50,7 @@ body {
     max-width: 70%;
     text-align: left;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap; /* Respetar saltos de línea */
 }
 
 .bot-message p {
@@ -61,6 +62,7 @@ body {
     max-width: 70%;
     text-align: left;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap; /* Respetar saltos de línea */
 }
 
 .user-message {
