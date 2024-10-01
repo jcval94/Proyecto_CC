@@ -19,6 +19,9 @@
         </form>
     </div>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         // Función para agregar un mensaje al chat
         function addMessage(message, isUser = true) {
@@ -31,22 +34,22 @@
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;  // Desplazarse automáticamente hacia el último mensaje
         }
-
+    
         // Manejar el envío del formulario
         document.getElementById('chat-form').addEventListener('submit', function (e) {
             e.preventDefault();  // Prevenir la recarga de la página
             const inputField = document.getElementById('text_input');
             const userMessage = inputField.value.trim();
-
+    
             if (userMessage) {
                 addMessage(userMessage);  // Agregar mensaje del usuario
                 inputField.value = '';  // Limpiar el campo de entrada
-
-                // Mostrar el mensaje de "procesando respuesta :taza de café:"
+    
+                // Mostrar el mensaje de "procesando respuesta ☕..."
                 const processingMessage = "Procesando respuesta ☕...";
                 addMessage(processingMessage, false);
-
-                // Simular un retraso de 3 segundos antes de obtener la respuesta real
+    
+                // Simular un retraso antes de obtener la respuesta real
                 setTimeout(() => {
                     // Eliminar el mensaje de "procesando respuesta"
                     const chatBox = document.getElementById('chat-box');
@@ -54,7 +57,7 @@
                     if (lastBotMessage) {
                         chatBox.removeChild(lastBotMessage);  // Eliminar el mensaje de procesamiento
                     }
-
+    
                     // Enviar el mensaje del usuario al backend mediante AJAX
                     fetch('/process', {
                         method: 'POST',
@@ -67,19 +70,81 @@
                     .then(data => {
                         // Agregar la respuesta del bot al chat
                         addMessage(data.result, false);
+    
+                        // Verificar si se recibieron 'categories' y 'scores'
+                        if (data.categories && data.scores && data.categories.length > 0 && data.scores.length > 0) {
+                            // Crear un elemento canvas para la gráfica
+                            const messageDiv = document.createElement('div');
+                            messageDiv.classList.add('bot-message');
+    
+                            const canvas = document.createElement('canvas');
+                            canvas.id = 'chartCanvas';
+                            canvas.style.maxWidth = '500px';  // Ajustar según sea necesario
+    
+                            messageDiv.appendChild(canvas);
+                            chatBox.appendChild(messageDiv);
+                            chatBox.scrollTop = chatBox.scrollHeight;
+    
+                            // Preparar los datos para la gráfica
+                            const chartData = {
+                                labels: data.categories,
+                                datasets: [{
+                                    label: 'Puntuación (%)',
+                                    data: data.scores,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',  // Personaliza los colores si lo deseas
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            };
+    
+                            // Crear la gráfica
+                            const ctx = canvas.getContext('2d');
+                            const barChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: chartData,
+                                options: {
+                                    indexAxis: 'y',  // Esto hace que las barras sean horizontales
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                            max: 100  // Asumiendo que las puntuaciones son porcentajes hasta 100
+                                        },
+                                        y: {
+                                            ticks: {
+                                                autoSkip: false
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    return context.parsed.x + '%';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     })
                     .catch(error => {
                         console.error('Error:', error);
                     });
-                }, 7000);  // Esperar 3 segundos
+                }, 10000);  // Esperar 3 segundos
             }
         });
-
+    
         // Para que el chat siempre baje hacia el último mensaje al cargar la página
         window.onload = function () {
             const chatBox = document.getElementById('chat-box');
             chatBox.scrollTop = chatBox.scrollHeight;
         };
     </script>
+
+
 </body>
 </html>

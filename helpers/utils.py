@@ -24,14 +24,10 @@ def call_predict_function(texto_input):
     response = requests.post(url, data=json_data, headers={'Content-Type': 'application/json'})
     resp__ = response.json()
 
-    # output_str = '''
-    # respuesta: %s
-    # momento: %s
-    # usuario: %s
-    # '''%(resp__['respuesta'], resp__['momento'], resp__['cliente_ip'])
+    print(resp__)
 
     # Imprimir la respuesta recibida
     print("Status Code:", response.status_code)
     print("Response Body:", response.json())
-    return resp__['respuesta']
+    return resp__
 

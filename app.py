@@ -64,7 +64,8 @@ def logout():
     session.pop('google_token', None)
     return redirect(url_for('index'))
 
-#------------------------------------
+#------------------------------------FRONT
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -74,7 +75,13 @@ def process():
     data = request.get_json()
     user_input = data.get('text_input', '')
     respuesta_cf = call_predict_function(user_input)
-    return jsonify({'result': respuesta_cf})
+    
+    # return jsonify({'result': respuesta_cf['respuesta']})
+    return jsonify({
+        'result': respuesta_cf['respuesta'],
+        'categories': respuesta_cf.get('categories', []),
+        'scores': respuesta_cf.get('scores', [])
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
