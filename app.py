@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 import requests
 import json
 import os
+import time
 from authlib.integrations.flask_client import OAuth
 
 from helpers.utils import cambiar_a_mayusculas, call_predict_function  # Importamos la función que cambiará a mayúsculas
@@ -74,9 +75,17 @@ def index():
 def process():
     data = request.get_json()
     user_input = data.get('text_input', '')
-    respuesta_cf = call_predict_function(user_input)
     
-    # return jsonify({'result': respuesta_cf['respuesta']})
+    # Iniciar el temporizador antes de llamar a call_predict_function
+    start_time = time.time()
+    respuesta_cf = call_predict_function(user_input)
+    # Finalizar el temporizador después de que call_predict_function termine
+    end_time = time.time()
+    
+    # Calcular el tiempo transcurrido
+    elapsed_time = end_time - start_time
+    print(f"Tiempo de ejecución de call_predict_function: {elapsed_time:.2f} segundos")
+    
     return jsonify({
         'result': respuesta_cf['respuesta'],
         'categories': respuesta_cf.get('categories', []),
